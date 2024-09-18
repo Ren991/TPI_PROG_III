@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Data
+namespace Domain.Interfaces
 {
-    public class UserRepository
+    internal class IRepositoryBase
     {
-
-
     }
 }

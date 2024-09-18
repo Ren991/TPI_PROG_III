@@ -14,6 +14,7 @@ namespace Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
 
+        [Required]
         public string Password { get; set; }
 
         public string Name { get; set; }

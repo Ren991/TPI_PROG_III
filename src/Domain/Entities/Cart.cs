@@ -16,7 +16,7 @@ namespace Domain.Entities
 
         public string TypePayment { get; set; }
 
-        public bool IsPayed { get; set; }
+        public bool IsPayabled { get; set; }
 
 
     }

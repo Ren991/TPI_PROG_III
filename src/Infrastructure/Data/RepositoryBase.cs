@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Data
 {
-    public class UserRepository
+    internal class RepositoryBase
     {
-
-
     }
 }
