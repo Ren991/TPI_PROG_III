@@ -26,5 +26,7 @@ namespace Domain.Entities
 
         public string Category { get; set; }
 
+        public SaleLine SaleLine { get; set; }
+
     }
 }

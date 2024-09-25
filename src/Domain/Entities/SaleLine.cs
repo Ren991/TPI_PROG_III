@@ -10,11 +10,13 @@ namespace Domain.Entities
     {
         public string Id { get; set; } 
 
-        public Product product { get; set; }
+        public Product Product { get; set; }
 
         public double SubtotalPrice { get; set; }
 
         public int Quantity { get; set; }
+
+        public ICollection<Product> ProductsList { get; set; } = new List<Product>();
 
     }
 }

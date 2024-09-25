@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Enums;
 
 namespace Domain.Entities
 {
@@ -12,7 +13,7 @@ namespace Domain.Entities
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public string Password { get; set; }
@@ -23,6 +24,9 @@ namespace Domain.Entities
 
         public string Email { get; set; }
 
-        public string Role { get; set; }
+        public Role Role { get; set; }
+
+        public ICollection<Cart> Carts { get; set; }
+
     }
 }
