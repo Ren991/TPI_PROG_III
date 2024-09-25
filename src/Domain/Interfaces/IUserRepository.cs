@@ -15,5 +15,6 @@ namespace Domain.Interfaces
         Task<List<User>> ListAsync();
         Task UpdateAsync(User user);
         User? GetUserByUserName(string userName);
+        IEnumerable<User> GetAll();
     }
 }

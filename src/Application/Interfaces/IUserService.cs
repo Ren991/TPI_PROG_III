@@ -11,7 +11,7 @@ namespace Application.Interfaces
 {
     public interface IUserService
     {
-        ICollection<UserResponse> GetAllUsers();
+        IEnumerable<UserResponse> GetAllUsers();
         UserResponse GetUserById(int id);
 
         User GetUserByUserName(string userName);

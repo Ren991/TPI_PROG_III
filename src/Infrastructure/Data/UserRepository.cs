@@ -56,5 +56,10 @@ namespace Infrastructure.Data
         {
             return _context.Users.SingleOrDefault(p => p.Name == userName);
         }
+
+        public IEnumerable<User> GetAll() 
+        {
+            return _context.Users;
+        }
     }
 }

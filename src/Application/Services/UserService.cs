@@ -18,10 +18,11 @@ namespace Application.Services
             _userRepository = userRepository;
         }
 
-        public ICollection<UserResponse> GetAllUsers()
+        public IEnumerable<UserResponse> GetAllUsers()
         {
-            var users = UserResponse.ToDtoList(_userRepository.ListAsync().Result ?? throw new KeyNotFoundException("No se encontraron usuarios"));
-            return users;
+            var users = _userRepository.GetAll();
+                //.ToDtoList(_userRepository.ListAsync().Result ?? throw new KeyNotFoundException("No se encontraron usuarios"));
+            return _userRepository.GetAll;
         }
 
         public UserResponse GetUserById(int id)
