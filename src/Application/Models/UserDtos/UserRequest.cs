@@ -1,47 +1,39 @@
 ﻿using Domain.Entities;
 using Domain.Enums;
 using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Application.Models.UserDtos
-{
+{ 
     public class UserCreateRequest
     {
-        [Required]
         public string Name { get; set; }
 
-        [Required]
-        [EmailAddress]
+        public string LastName { get; set; }    
+
         public string Email { get; set; }
 
-        [Required]
         public string Password { get; set; }
 
-        [Required]
-        public string UserName { get; set; }
-
-        [Required]
         public Role Role { get; set; }
 
-        public static User ToEntity(UserCreateRequest dto)
+      
+        public static User ToEntity(UserCreateRequest userDto)
         {
-            return new User
-            {
-                Name = dto.Name,
-                Email = dto.Email,
-                Password = dto.Password,
-                Role = dto.Role,
-            };
-        }
+            User user = new User();
+            user.Name = userDto.Name;
+            user.LastName = userDto.LastName;
+            user.Email = userDto.Email;
+            user.Password = userDto.Password;
+            user.Role = userDto.Role;
+            Cart cart = new Cart();
+            user.Carts.Add(cart);
 
-        public static bool validateDto(UserCreateRequest dto)
-        {
-            if (dto.Name == default ||
-                dto.Email == default ||
-                dto.Password == default)
-                return false;
+            return user;
 
-            return true;
         }
     }
 }

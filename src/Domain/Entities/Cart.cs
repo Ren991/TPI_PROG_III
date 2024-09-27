@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,13 +15,15 @@ namespace Domain.Entities
 
         public double TotalPrice { get; set; }
 
-        public string TypePayment { get; set; }
+        public TypePayment TypePayment { get; set; }
 
         public bool IsPayabled { get; set; }
 
+        public int UserId { get; set; } // Esta es la clave foránea que conecta con User
+
         public User User { get; set; }
 
-        public SaleLine SaleLine { get; set; }
+        //public SaleLine SaleLine { get; set; }
 
     }
 }

@@ -11,12 +11,17 @@ namespace Application.Interfaces
 {
     public interface IUserService
     {
-        IEnumerable<UserResponse> GetAllUsers();
-        UserResponse GetUserById(int id);
+       
+        List<User> GetAllUsers();
+        UserDto AddNewUser(UserCreateRequest userDto);
 
-        User GetUserByUserName(string userName);
-        void UpdateUser(int id, UserCreateRequest customer);
+        UserDto GetUserByEmail(string email);
+
+
+
+        void UpdateUser(int id, string password);
+
         void DeleteUser(int id);
-        UserResponse CreateUser(UserCreateRequest user);
+
     }
 }

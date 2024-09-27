@@ -7,11 +7,6 @@
         Debit,
 
     }
-    public enum Role
-    {
-        Admin,
-        CommonUser,
-        SuperAdmin,
-    }
+  
 
 }

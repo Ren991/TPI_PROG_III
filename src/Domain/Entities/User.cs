@@ -15,7 +15,6 @@ namespace Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
         public string Password { get; set; }
 
         public string Name { get; set; }
@@ -26,7 +25,7 @@ namespace Domain.Entities
 
         public Role Role { get; set; }
 
-        public ICollection<Cart> Carts { get; set; }
+        public ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
     }
 }

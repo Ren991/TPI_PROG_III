@@ -1,11 +1,14 @@
 ﻿using Application.Interfaces;
-using Application.Models.UserDtos;
+using Application.Models;
+using Application.Models;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Models.UserDtos;
 
 namespace Application.Services
 {
@@ -18,49 +21,47 @@ namespace Application.Services
             _userRepository = userRepository;
         }
 
-        public IEnumerable<UserResponse> GetAllUsers()
+        public List<User> GetAllUsers()
         {
-            var users = _userRepository.GetAll();
-                //.ToDtoList(_userRepository.ListAsync().Result ?? throw new KeyNotFoundException("No se encontraron usuarios"));
-            return _userRepository.GetAll;
+            return _userRepository.Get();
         }
 
-        public UserResponse GetUserById(int id)
+        public UserDto AddNewUser(UserCreateRequest userDto)
         {
-            UserResponse userDto = UserResponse.ToDto(_userRepository.GetByIdAsync(id).Result ?? throw new KeyNotFoundException("No se encontró el usuario"));
-            return userDto;
+            var existingUser = _userRepository.GetByEmail(userDto.Email);
+            if (existingUser != null)
+            {
+                throw new Exception("Email ya registrado. Por favor intente nuevamente");
+            }
+            return UserDto.ToDto(_userRepository.Create(UserCreateRequest.ToEntity(userDto)));
         }
 
-        public User? GetUserByUserName(string userName)
+        public UserDto GetUserByEmail(string email)
         {
-            return _userRepository.GetUserByUserName(userName);
+            return UserDto.ToDto(_userRepository.GetByEmail(email));
         }
 
-        public UserResponse CreateUser(UserCreateRequest dto)
+        
+
+        public void UpdateUser(int id, string password)
         {
-            return UserResponse.ToDto(_userRepository.AddAsync(UserCreateRequest.ToEntity(dto)).Result);
-        }
-
-        public void UpdateUser(int id, UserCreateRequest dto)
-        {
-
-            var existingUser = _userRepository.GetByIdAsync(id).Result ?? throw new KeyNotFoundException("No se encontró el usuario");
-
-            if (_userRepository.GetUserByUserName(dto.UserName) != null)
-                throw new InvalidOperationException("El nombre de usuario ya está en uso.");
-
-            existingUser.Name = dto.Name;
-            existingUser.Email = dto.Email;
-            existingUser.Password = dto.Password;
-            existingUser.Role = dto.Role;
-
-            _userRepository.UpdateAsync(existingUser).Wait();
+            User? user = _userRepository.Get(id);
+            if (user == null)
+            {
+                throw new Exception("No se encontró el usuario");
+            }
+            user.Password = password;
+            _userRepository.Update(user);
         }
 
         public void DeleteUser(int id)
         {
-            var userDto = _userRepository.GetByIdAsync(id).Result ?? throw new KeyNotFoundException("No se encontró el usuario");
-            _userRepository.DeleteAsync(userDto);
+            User? user = _userRepository.Get(id);
+            if (user == null)
+            {
+                throw new Exception("No se encontró el usuario");
+            }
+            _userRepository.Delete(user);
         }
     }
 }
