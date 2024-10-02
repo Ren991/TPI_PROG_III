@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,14 +9,21 @@ namespace Domain.Entities
 {
     public class Cart
     {
-        public ICollection<Product> ProductsList { get; set; } = new List<Product>();
+        public ICollection<SaleLine> SaleLineList { get; set; } = new List<SaleLine>();
 
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public double TotalPrice { get; set; }
 
-        public string TypePayment { get; set; }
+        public TypePayment TypePayment { get; set; }
 
+        public bool IsPayabled { get; set; }
+
+        public int UserId { get; set; } // Esta es la clave foránea que conecta con User
+
+        public User User { get; set; }
+
+        //public SaleLine SaleLine { get; set; }
 
     }
 }
