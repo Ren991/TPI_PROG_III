@@ -23,6 +23,7 @@ namespace Application.Models.UserDtos
         public Role Role { get; set; }
 
         public ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
         public static UserDto ToDto(User user)
         {
             UserDto userDto = new();

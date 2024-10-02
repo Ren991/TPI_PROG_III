@@ -23,7 +23,8 @@ namespace Application.Services
 
         public List<User> GetAllUsers()
         {
-            return _userRepository.Get();
+            var users = _userRepository.Get();
+            return users;
         }
 
         public UserDto AddNewUser(UserCreateRequest userDto)

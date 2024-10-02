@@ -27,8 +27,9 @@ namespace Web.Controllers
         public IActionResult GetAll()
         {
             
+            var users = _userService.GetAllUsers();
 
-            return Ok(_userService.GetAllUsers());
+            return Ok(users);
         }
 
         [HttpPost]

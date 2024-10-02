@@ -12,7 +12,7 @@ namespace Domain.Entities
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }
+        public int Id { get; set; }
         
         public string Name { get; set; }
 
@@ -25,8 +25,6 @@ namespace Domain.Entities
         public string Image { get; set; }
 
         public string Category { get; set; }
-
-        //public SaleLine SaleLine { get; set; }
 
     }
 }
