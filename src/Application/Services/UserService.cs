@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Models;
-using Application.Models;
+using Application.Models.AuthDtos;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Interfaces;
@@ -42,7 +42,30 @@ namespace Application.Services
             return UserDto.ToDto(_userRepository.GetByEmail(email));
         }
 
-        
+        public UserLoginRequest GetUserToAuthenticate(string email)
+        {
+            try
+            {
+                UserDto entity = GetUserByEmail(email);
+
+                if (entity == null)
+                {
+                    throw new Exception("Usuario no encontrado.");
+                }
+
+                UserLoginRequest entityToAuthenticate = new();
+                entityToAuthenticate.Email = entity.Email;
+                entityToAuthenticate.Password = entity.Password;
+
+                return entityToAuthenticate;
+
+            }catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
+        }
+
 
         public void UpdateUser(int id, string password)
         {

@@ -31,13 +31,23 @@ namespace Web.Controllers
             return Ok(products);
         }
 
+        [Authorize]
+
         [HttpPost]
 
         public IActionResult AddProduct([FromBody] ProductCreateRequest product)
 
         {
-            var newProduct = _productService.AddNewProduct(product);
-            return Ok(newProduct);
+            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userTypeString == "Admin")
+            {
+                var newProduct = _productService.AddNewProduct(product);
+                return Ok(newProduct);
+            }
+            else
+            {
+                return Forbid();
+            }
         }
 
         [HttpDelete]
