@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
+
 namespace Web.Controllers
 {
     [Route("api/[controller]")]
@@ -30,8 +31,6 @@ namespace Web.Controllers
 
             return Ok(products);
         }
-
-        [Authorize]
 
         [HttpPost]
 

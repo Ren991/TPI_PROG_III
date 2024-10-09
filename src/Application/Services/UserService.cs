@@ -56,6 +56,7 @@ namespace Application.Services
                 UserLoginRequest entityToAuthenticate = new();
                 entityToAuthenticate.Email = entity.Email;
                 entityToAuthenticate.Password = entity.Password;
+                entityToAuthenticate.Role = entity.Role;
 
                 return entityToAuthenticate;
 

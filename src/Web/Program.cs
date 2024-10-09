@@ -15,7 +15,7 @@ using Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.Services.AddEndpointsApiExplorer();
 // Add services to the container.
 
 builder.Services.AddControllers()
@@ -76,12 +76,19 @@ builder.Services.AddAuthentication("Bearer") //"Bearer" es el tipo de auntentica
     }
 );
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+
+});
+
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>(); // Assuming UserService exists
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>(); // Assuming ProductRepository exists
 builder.Services.AddScoped<IProductService, ProductService>(); // Assuming ProductService exists
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+
 
 var app = builder.Build();
 
@@ -95,6 +102,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseAuthentication();
 
 app.MapControllers();
 
