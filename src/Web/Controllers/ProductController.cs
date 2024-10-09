@@ -21,7 +21,7 @@ namespace Web.Controllers
         {
             _productService = productService;
         }
-        
+
         [HttpGet]
 
         public IActionResult GetAll()
@@ -33,6 +33,7 @@ namespace Web.Controllers
         }
 
         [HttpPost]
+        [Authorize]
 
         public IActionResult AddProduct([FromBody] ProductCreateRequest product)
 
@@ -50,20 +51,38 @@ namespace Web.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
 
         public IActionResult DeleteProduct([FromBody] int productId)
         {
+            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userTypeString == "Admin")
+            {
 
-            _productService.DeleteProduct(productId);
+                _productService.DeleteProduct(productId);
             return Ok(new { message = "Product deleted successfully." });
+            }
+            else
+            {
+                return Forbid();
+            }
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public IActionResult UpdateProduct(int id, [FromQuery] string description, [FromQuery] double price, [FromQuery] int stock)
-        {          
-            _productService.UpdateProduct(id, description, price, stock);
-            return Ok(new { message = "Producto actualizado exitosamente." });
-                
+        {
+            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userTypeString == "Admin")
+            {
+                _productService.UpdateProduct(id, description, price, stock);
+                return Ok(new { message = "Producto actualizado exitosamente." });
+            }
+            else
+            {
+                return Forbid();
+            }
+
         }
 
     }

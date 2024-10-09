@@ -79,7 +79,7 @@ builder.Services.AddAuthentication("Bearer") //"Bearer" es el tipo de auntentica
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
-
+    options.AddPolicy("CommonUser", policy => policy.RequireRole("CommonUser"));
 });
 
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -103,7 +103,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseAuthentication();
+//app.UseAuthentication();
 
 app.MapControllers();
 

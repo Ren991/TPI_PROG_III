@@ -39,13 +39,13 @@ namespace Infrastructure.Services
             var user = _userRepository.GetByEmail(authenticationRequest.Email);
 
             if (user == null) return null;
-           
-            if (authenticationRequest.Role == Role.CommonUser || authenticationRequest.Role == Role.Admin || authenticationRequest.Role == Role.SuperAdmin)
-            {
-                if (user.Role == authenticationRequest.Role && user.Password == authenticationRequest.Password) return user;
-            }
+
+            if (user == null) return null;
+
+            if (authenticationRequest.Email == user.Email && user.Password == authenticationRequest.Password) return user;
 
             return null;
+
         }
 
         public string AuthenticateAsync(UserLoginRequest authenticationRequest)
