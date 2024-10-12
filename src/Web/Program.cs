@@ -85,9 +85,11 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>(); // Assuming UserService exists
+builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>(); // Assuming ProductRepository exists
 builder.Services.AddScoped<IProductService, ProductService>(); // Assuming ProductService exists
+builder.Services.AddScoped<ICartRepository, CartRepository>();
 
 
 var app = builder.Build();

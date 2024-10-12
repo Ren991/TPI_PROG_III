@@ -12,11 +12,15 @@ namespace Domain.Entities
 
         public Product Product { get; set; }
 
+        public int ProductId {  get; set; }
+
+
         public double SubtotalPrice { get; set; }
 
         public int Quantity { get; set; }
 
-        public ICollection<Product> ProductsList { get; set; } = new List<Product>();
+        public int CartId { get; set; }  // Foreign key
+        public Cart ?Cart { get; set; }
 
     }
 }
