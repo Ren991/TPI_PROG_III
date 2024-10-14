@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class CartService: ICartService
-
+    public class CartService : ICartService
     {
         private readonly ICartRepository _cartRepository;
         private readonly IProductRepository _productRepository;
@@ -21,20 +21,29 @@ namespace Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task<Cart> GetCartByUserIdAsync(int userId)
+        // Obtener carrito por CartId y UserId
+        public async Task<Cart> GetCartByIdAndUserIdAsync(int cartId, int userId)
         {
-            return await _cartRepository.GetCartByUserIdAsync(userId);
+            return await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
         }
 
-        public async Task AddProductToCartAsync(int userId, int productId, int quantity)
+        // Crear un nuevo carrito para un usuario
+        public async Task<Cart> CreateCartForUserAsync(int userId)
         {
-            var cart = await _cartRepository.GetCartByUserIdAsync(userId);
-            var product =  _productRepository.Get(productId);
+            var cart = new Cart { UserId = userId, SaleLineList = new List<SaleLine>(), TotalPrice = 0 };
+            await _cartRepository.CreateAsync(cart);
+            return cart;
+        }
+
+        // Añadir producto al carrito específico del usuario
+        public async Task AddProductToCartAsync(int userId, int cartId, int productId, int quantity)
+        {
+            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
+            var product = _productRepository.Get(productId);
 
             if (cart == null)
             {
-                cart = new Cart { UserId = userId, SaleLineList = new List<SaleLine>() };
-                await _cartRepository.CreateAsync(cart);
+                throw new Exception("El carrito no existe.");
             }
 
             var saleLine = cart.SaleLineList.FirstOrDefault(sl => sl.ProductId == productId);
@@ -53,16 +62,17 @@ namespace Application.Services
                     SubtotalPrice = quantity * product.Price
                 });
             }
+
             // Recalcular el TotalPrice después de agregar el producto
             cart.TotalPrice = cart.SaleLineList.Sum(sl => sl.SubtotalPrice);
-
 
             await _cartRepository.UpdateAsync(cart);
         }
 
-        public async Task RemoveProductFromCartAsync(int userId, int productId)
+        // Eliminar un producto del carrito específico del usuario
+        public async Task RemoveProductFromCartAsync(int userId, int cartId, int productId)
         {
-            var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
             if (cart != null)
             {
                 var saleLine = cart.SaleLineList.FirstOrDefault(sl => sl.ProductId == productId);
@@ -75,9 +85,10 @@ namespace Application.Services
             }
         }
 
-        public async Task ClearCartAsync(int userId)
+        // Vaciar un carrito específico del usuario
+        public async Task ClearCartAsync(int userId, int cartId)
         {
-            var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
             if (cart != null)
             {
                 cart.SaleLineList.Clear();
@@ -86,11 +97,46 @@ namespace Application.Services
             }
         }
 
-        public async Task<double> CalculateTotalPriceAsync(int userId)
+        // Calcular el precio total de un carrito específico del usuario
+        public async Task<double> CalculateTotalPriceAsync(int userId, int cartId)
         {
-            var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
             return cart?.SaleLineList.Sum(sl => sl.SubtotalPrice) ?? 0;
         }
+
+        // Obtener todos los carritos de un usuario
+        public async Task<List<Cart>> GetCartsByUserIdAsync(int userId)
+        {
+            return await _cartRepository.GetCartByUserIdAsync(userId);
+        }
+
+        public async Task PayCartAsync(int userId, int cartId, TypePayment typePayment)
+        {
+            // Buscar el carrito del usuario
+            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
+            if (cart == null)
+            {
+                throw new Exception("Carrito no encontrado.");
+            }
+
+            if (cart.IsPayabled)
+            {
+                throw new Exception("El carrito ya ha sido pagado.");
+            }
+
+            // Cambiar la propiedad IsPayabled a true y asignar el método de pago
+            cart.IsPayabled = true;
+            cart.TypePayment = typePayment;
+
+            // Guardar los cambios en el repositorio
+            await _cartRepository.UpdateAsync(cart);
+        }
+
+        public async Task<List<Cart>> GetPaidCartsByUserIdAsync(int userId)
+        {
+            return await _cartRepository.GetPaidCartsByUserIdAsync(userId);
+        }
+
 
     }
 }

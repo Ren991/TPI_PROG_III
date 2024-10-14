@@ -18,32 +18,42 @@ namespace Infrastructure.Data
             _context = context;
         }
 
-        public async Task<Cart> GetCartByUserIdAsync(int userId)
+        public async Task<Cart> GetCartByIdAndUserIdAsync(int cartId, int userId)
         {
-            var cart = await _context.Carts
-                             .Include(c => c.SaleLineList)
-                             .ThenInclude(sl => sl.Product)
-                             .FirstOrDefaultAsync(c => c.UserId == userId);
-
-            // Si el carrito existe, recalculamos el TotalPrice
-            if (cart != null)
-            {
-                cart.TotalPrice = cart.SaleLineList.Sum(sl => sl.SubtotalPrice);
-            }
-
-            return cart;
+            return await _context.Carts
+                .Include(c => c.SaleLineList) // Incluir las líneas de venta del carrito
+                .FirstOrDefaultAsync(c => c.Id == cartId && c.UserId == userId);
         }
 
+        // Obtener todos los carritos de un usuario por userId
+        public async Task<List<Cart>> GetCartByUserIdAsync(int userId)
+        {
+            return await _context.Carts
+                .Include(c => c.SaleLineList) // Incluir las líneas de venta de cada carrito
+                .Where(c => c.UserId == userId)
+                .ToListAsync();
+        }
+
+        // Crear un nuevo carrito
         public async Task CreateAsync(Cart cart)
         {
-            await _context.Carts.AddAsync(cart);
+            _context.Carts.Add(cart);
             await _context.SaveChangesAsync();
         }
 
+        // Actualizar un carrito existente
         public async Task UpdateAsync(Cart cart)
         {
             _context.Carts.Update(cart);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Cart>> GetPaidCartsByUserIdAsync(int userId)
+        {
+            return await _context.Carts
+                .Include(c => c.SaleLineList)
+                .Where(cart => cart.IsPayabled && cart.UserId == userId)
+                .ToListAsync();
         }
 
     }
