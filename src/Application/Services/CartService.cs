@@ -130,6 +130,16 @@ namespace Application.Services
 
             // Guardar los cambios en el repositorio
             await _cartRepository.UpdateAsync(cart);
+
+            foreach (var saleLine in cart.SaleLineList)
+            {
+                var product =  _productRepository.Get(saleLine.ProductId); // Asegúrate de que esto devuelva el tipo correcto
+                if (product != null)
+                {
+                    product.Stock -= saleLine.Quantity; // Restar la cantidad vendida
+                    _productRepository.Update(product); // Actualizar el producto
+                }
+            }
         }
 
         public async Task<List<Cart>> GetPaidCartsByUserIdAsync(int userId)
