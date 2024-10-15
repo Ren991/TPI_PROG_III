@@ -15,6 +15,8 @@ namespace Infrastructure.Data
 
         
 
+        
+
    
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -29,7 +31,54 @@ namespace Infrastructure.Data
                       .ValueGeneratedOnAdd(); 
             });
 
-        
+            // Configuración de User
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(u => u.Id);
+                entity.Property(u => u.Id)
+                      .ValueGeneratedOnAdd();
+            });
+
+            // Configuración de Cart
+            modelBuilder.Entity<Cart>(entity =>
+            {
+                entity.HasKey(c => c.Id);
+                entity.Property(c => c.Id)
+                      .ValueGeneratedOnAdd();
+
+                // Relación uno a muchos entre User y Cart
+                entity.HasOne(c => c.User)
+                      .WithMany(u => u.Carts)
+                      .HasForeignKey(c => c.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);  // Borrar los carritos si se borra el usuario
+
+                // Relación uno a muchos entre Cart y SaleLine
+                entity.HasMany(c => c.SaleLineList)
+                      .WithOne(sl => sl.Cart)
+                      .HasForeignKey(sl => sl.CartId)
+                      .OnDelete(DeleteBehavior.Cascade);  // Borrar las líneas de venta si se borra el carrito
+            });
+
+            // Configuración de SaleLine
+            modelBuilder.Entity<SaleLine>(entity =>
+            {
+                entity.HasKey(sl => sl.Id);
+                entity.Property(sl => sl.Id)
+                      .ValueGeneratedOnAdd();
+
+                // Relación uno a uno entre SaleLine y Product
+                entity.HasOne(sl => sl.Product)
+                      .WithMany()  // Un producto puede aparecer en varias líneas de venta
+                      .HasForeignKey(sl => sl.ProductId)
+                      .OnDelete(DeleteBehavior.Restrict);  // No permitir borrar un producto si está en una línea de venta
+
+                // Relación muchos a uno entre SaleLine y Cart
+                entity.HasOne(sl => sl.Cart)
+                      .WithMany(c => c.SaleLineList)
+                      .HasForeignKey(sl => sl.CartId);
+            });
+
+
         }
 
 
