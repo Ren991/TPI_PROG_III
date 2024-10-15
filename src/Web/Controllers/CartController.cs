@@ -43,7 +43,7 @@ namespace Web.Controllers
             }
 
             // Agregar el producto al carrito
-            await _cartService.AddProductToCartAsync(userId, cartId, productId, quantity);
+            await _cartService.AddProductToCartAsync(userId, productId, quantity);
 
             return Ok("Producto agregado al carrito.");
         }

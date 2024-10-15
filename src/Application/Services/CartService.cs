@@ -36,15 +36,23 @@ namespace Application.Services
         }
 
         // Añadir producto al carrito específico del usuario
-        public async Task AddProductToCartAsync(int userId, int cartId, int productId, int quantity)
+        public async Task AddProductToCartAsync(int userId, int productId, int quantity)
         {
-            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
-            var product = _productRepository.Get(productId);
+            // Obtener todos los carritos del usuario
+            var carts = await _cartRepository.GetCartByUserIdAsync(userId);
 
+            // Buscar el primer carrito no pagado
+            var cart = carts.FirstOrDefault(c => !c.IsPayabled);
+
+            // Si no existe un carrito no pagado, crear uno nuevo
             if (cart == null)
             {
-                throw new Exception("El carrito no existe.");
+                cart = new Cart { UserId = userId };
+                await _cartRepository.CreateAsync(cart);
             }
+
+            // Agregar el producto al carrito (código existente, adaptado)
+            var product = _productRepository.Get(productId);
 
             var saleLine = cart.SaleLineList.FirstOrDefault(sl => sl.ProductId == productId);
             if (saleLine != null)
@@ -63,9 +71,10 @@ namespace Application.Services
                 });
             }
 
-            // Recalcular el TotalPrice después de agregar el producto
+            // Recalcular el TotalPrice del carrito
             cart.TotalPrice = cart.SaleLineList.Sum(sl => sl.SubtotalPrice);
 
+            // Actualizar el carrito en la base de datos
             await _cartRepository.UpdateAsync(cart);
         }
 

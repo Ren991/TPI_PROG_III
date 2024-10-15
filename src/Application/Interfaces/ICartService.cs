@@ -13,7 +13,7 @@ namespace Application.Interfaces
         Task<Cart> GetCartByIdAndUserIdAsync(int cartId, int userId);
         Task<Cart> CreateCartForUserAsync(int userId);
         Task<List<Cart>> GetPaidCartsByUserIdAsync(int userId);
-        Task AddProductToCartAsync(int userId, int cartId, int productId, int quantity);
+        Task AddProductToCartAsync(int userId, int productId, int quantity);
         Task RemoveProductFromCartAsync(int userId, int cartId, int productId);
         Task ClearCartAsync(int userId, int cartId);
         Task<double> CalculateTotalPriceAsync(int userId, int cartId);
