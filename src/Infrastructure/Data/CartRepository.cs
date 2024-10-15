@@ -35,17 +35,19 @@ namespace Infrastructure.Data
         }
 
         // Crear un nuevo carrito
-        public async Task CreateAsync(Cart cart)
+        public async Task<Cart> CreateAsync(Cart cart)
         {
             _context.Carts.Add(cart);
             await _context.SaveChangesAsync();
+            return cart;
         }
 
         // Actualizar un carrito existente
-        public async Task UpdateAsync(Cart cart)
+        public async Task<Cart> UpdateAsync(Cart cart)
         {
             _context.Carts.Update(cart);
             await _context.SaveChangesAsync();
+            return cart;
         }
 
         public async Task<List<Cart>> GetPaidCartsByUserIdAsync(int userId)

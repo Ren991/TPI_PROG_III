@@ -12,8 +12,8 @@ namespace Domain.Interfaces
     {
         Task<Cart> GetCartByIdAndUserIdAsync(int cartId, int userId);
         Task<List<Cart>> GetCartByUserIdAsync(int userId);
-        Task CreateAsync(Cart cart);        
-        Task UpdateAsync(Cart cart);
+        Task<Cart> CreateAsync(Cart cart);        
+        Task<Cart> UpdateAsync(Cart cart);
 
         Task<List<Cart>> GetPaidCartsByUserIdAsync(int userId);
 
