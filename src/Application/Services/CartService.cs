@@ -149,7 +149,7 @@ namespace Application.Services
 
             foreach (var saleLine in cart.SaleLineList)
             {
-                var product =  _productRepository.Get(saleLine.ProductId); // Asegúrate de que esto devuelva el tipo correcto
+                var product =  _productRepository.Get(saleLine.ProductId); 
                 if (product != null)
                 {
                     product.Stock -= saleLine.Quantity; // Restar la cantidad vendida

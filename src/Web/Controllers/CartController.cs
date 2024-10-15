@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Models.CartDtos;
 using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -24,6 +25,7 @@ namespace Web.Controllers
             return cart != null ? Ok(cart) : NotFound();
         }
 
+        [Authorize]
         [HttpPost("/add-product/{productId}")]
         public async Task<IActionResult> AddProductToCart(int cartId,int productId, int quantity)
         {
@@ -48,6 +50,7 @@ namespace Web.Controllers
             return Ok("Producto agregado al carrito.");
         }
 
+        [Authorize]
         [HttpDelete("/remove-product/{productId}")]
         public async Task<IActionResult> RemoveProductFromCart(int cartId, int productId)
         {
@@ -63,6 +66,7 @@ namespace Web.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpPost("/clear")]
         public async Task<IActionResult> ClearCart(int cartId)
         {
@@ -77,13 +81,23 @@ namespace Web.Controllers
             return NoContent();
         }
 
-        [HttpGet("{userId}/total-price")]
-        public async Task<IActionResult> CalculateTotalPrice(int userId, int cartId)
+        [Authorize]
+        [HttpGet("/cart/total-price")]
+        public async Task<IActionResult> CalculateTotalPrice( int cartId)
         {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            // Verificar si userIdClaim es nulo o no se puede convertir a int
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized("Id de usuario no encontrado.");
+            }
+
             var totalPrice = await _cartService.CalculateTotalPriceAsync(userId, cartId);
             return Ok(totalPrice);
         }
 
+        [Authorize]
         [HttpPost("{cartId}/pay")]
         public async Task<IActionResult> PayCart(int cartId, [FromBody] PaymentRequest paymentRequest)
         {
@@ -115,6 +129,7 @@ namespace Web.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("paid")]
         public async Task<IActionResult> GetPaidCarts()
         {
