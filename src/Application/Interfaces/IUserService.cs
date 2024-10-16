@@ -15,6 +15,8 @@ namespace Application.Interfaces
         List<User> GetAllUsers();
         UserDto AddNewUser(UserCreateRequest userDto);
 
+        UserDto AddNewAdminUser(UserAdminCreateRequest userDto);
+
         UserDto GetUserByEmail(string email);
 
 
