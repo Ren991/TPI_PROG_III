@@ -27,7 +27,7 @@ namespace Web.Controllers
 
         [Authorize]
         [HttpPost("/add-product/{productId}")]
-        public async Task<IActionResult> AddProductToCart(int cartId,int productId, int quantity)
+        public async Task<IActionResult> AddProductToCart(int productId, int quantity)
         {
             // Obtener el id del usuario logueado
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;

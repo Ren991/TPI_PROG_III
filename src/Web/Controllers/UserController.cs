@@ -34,7 +34,7 @@ namespace Web.Controllers
 
         [HttpPost]
         
-        public IActionResult AddUser([FromBody] UserCreateRequest user)
+        public IActionResult AddUser([FromBody] UserCreateRequest user) // Este endpoint es para crear usuario comunes.
 
         {
             var newUser = _userService.AddNewUser(user);

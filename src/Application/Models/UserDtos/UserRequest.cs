@@ -18,7 +18,7 @@ namespace Application.Models.UserDtos
 
         public string Password { get; set; }
 
-        public Role Role { get; set; }
+        //public Role Role { get; set; }
 
       
         public static User ToEntity(UserCreateRequest userDto)
@@ -28,7 +28,7 @@ namespace Application.Models.UserDtos
             user.LastName = userDto.LastName;
             user.Email = userDto.Email;
             user.Password = userDto.Password;
-            user.Role = userDto.Role;
+            user.Role = Role.CommonUser;
             Cart cart = new Cart();
             user.Carts.Add(cart);
 
