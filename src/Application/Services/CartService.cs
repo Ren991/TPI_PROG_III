@@ -40,7 +40,8 @@ namespace Application.Services
 
         // Añadir producto al carrito específico del usuario
         public async Task AddProductToCartAsync(int userId, int productId, int quantity)
-        {
+        {// En realidad se almacena en el localStorage.
+
             // Obtener todos los carritos del usuario
             var carts = await _cartRepository.GetCartByUserIdAsync(userId);
 

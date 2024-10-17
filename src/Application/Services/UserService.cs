@@ -37,6 +37,17 @@ namespace Application.Services
             return UserDto.ToDto(_userRepository.Create(UserCreateRequest.ToEntity(userDto)));
         }
 
+        public UserDto AddNewAdminUser(UserAdminCreateRequest userDto)
+        {
+            var existingUser = _userRepository.GetByEmail(userDto.Email);
+            if (existingUser != null)
+            {
+                throw new Exception("Email ya registrado. Por favor intente nuevamente");
+            }
+            return UserDto.ToDto(_userRepository.Create(UserAdminCreateRequest.ToEntity(userDto)));
+        }
+
+
         public UserDto GetUserByEmail(string email)
         {
             return UserDto.ToDto(_userRepository.GetByEmail(email));
