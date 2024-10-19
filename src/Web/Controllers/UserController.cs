@@ -41,7 +41,7 @@ namespace Web.Controllers
             return Ok(newUser);            
         }
 
-        [Authorize]
+        [Authorize("SuperAdmin")]
         [HttpPost("/create-admin")]
 
         public IActionResult AddAdminUser([FromBody] UserAdminCreateRequest user) // Este endpoint es para crear usuario Admin.

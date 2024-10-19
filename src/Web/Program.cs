@@ -78,6 +78,7 @@ builder.Services.AddAuthentication("Bearer") //"Bearer" es el tipo de auntentica
 
 builder.Services.AddAuthorization(options =>
 {
+    options.AddPolicy("SuperAdmin", policy => policy.RequireRole("SuperAdmin"));
     options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
     options.AddPolicy("CommonUser", policy => policy.RequireRole("CommonUser"));
 });
