@@ -12,6 +12,7 @@ using static Infrastructure.Services.AuthenticationService;
 using System.Text;
 using System.Text.Json.Serialization;
 using Infrastructure.Services;
+using Web.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,6 +102,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 

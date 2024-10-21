@@ -22,6 +22,7 @@ namespace Web.Controllers
             _userService = userService;
         }
 
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet]
         
         public IActionResult GetAll()
@@ -48,7 +49,10 @@ namespace Web.Controllers
 
         {
 
-            var roleClaim = User.FindFirst(ClaimTypes.Role); 
+            var newUser = _userService.AddNewAdminUser(user);
+            return Ok(newUser);
+
+            /*var roleClaim = User.FindFirst(ClaimTypes.Role); 
             
             if (roleClaim != null && roleClaim.Value == "SuperAdmin") 
             {
@@ -58,12 +62,12 @@ namespace Web.Controllers
             else 
             { 
                 return Unauthorized("El usuario no es un super administrador."); 
-            }
+            }*/
 
 
         }
 
-
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet("/email")]
         
         public IActionResult GetByEmail([FromQuery] string email)
@@ -76,11 +80,11 @@ namespace Web.Controllers
         public IActionResult UpdateUser([FromBody] string password)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            //var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
             if (userIdClaim == null)
             {
-                throw new Exception("Usuario no autenticado.");
+                throw new Exception("Unauthenticated User.");
             }
 
             if (!int.TryParse(userIdClaim.Value, out int userId))
@@ -93,6 +97,7 @@ namespace Web.Controllers
             return Ok(new { message = "Password updated successfully." });
         }
 
+        [Authorize("SuperAdmin")]
         [HttpDelete]
        
         public IActionResult DeleteUser([FromBody] int userId)
