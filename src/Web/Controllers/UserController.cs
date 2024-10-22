@@ -60,7 +60,7 @@ namespace Web.Controllers
           return Ok(_userService.GetUserByEmail(email));
         }
 
-        [Authorize(Roles = "SuperAdmin,Admin,CommonUser")]
+        [Authorize]
         [HttpPut("/password")]
         
         public IActionResult UpdateUser([FromBody] string password)

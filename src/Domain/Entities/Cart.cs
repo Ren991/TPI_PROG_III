@@ -9,7 +9,7 @@ namespace Domain.Entities
 {
     public class Cart
     {
-        public ICollection<CartLine> SaleLineList { get; set; } = new List<CartLine>();
+        public ICollection<CartLine> CartLineList { get; set; } = new List<CartLine>();
 
         public int Id { get; set; }
 
