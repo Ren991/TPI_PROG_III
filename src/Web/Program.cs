@@ -107,9 +107,9 @@ app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+app.UseAuthentication();
 
-//app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
