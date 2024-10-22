@@ -22,6 +22,7 @@ namespace Web.Controllers
             _userService = userService;
         }
 
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet]
         
         public IActionResult GetAll()
@@ -47,23 +48,11 @@ namespace Web.Controllers
         public IActionResult AddAdminUser([FromBody] UserAdminCreateRequest user) // Este endpoint es para crear usuario Admin.
 
         {
-
-            var roleClaim = User.FindFirst(ClaimTypes.Role); 
-            
-            if (roleClaim != null && roleClaim.Value == "SuperAdmin") 
-            {
-                var newUser = _userService.AddNewAdminUser(user);
-                return Ok(newUser); 
-            } 
-            else 
-            { 
-                return Unauthorized("El usuario no es un super administrador."); 
-            }
-
-
+            var newUser = _userService.AddNewAdminUser(user);
+            return Ok(newUser);
         }
 
-
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet("/email")]
         
         public IActionResult GetByEmail([FromQuery] string email)
@@ -71,17 +60,13 @@ namespace Web.Controllers
           return Ok(_userService.GetUserByEmail(email));
         }
 
+        [Authorize(Roles = "SuperAdmin,Admin,CommonUser")]
         [HttpPut("/password")]
         
         public IActionResult UpdateUser([FromBody] string password)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-            if (userIdClaim == null)
-            {
-                throw new Exception("Usuario no autenticado.");
-            }
 
             if (!int.TryParse(userIdClaim.Value, out int userId))
             {
@@ -93,6 +78,7 @@ namespace Web.Controllers
             return Ok(new { message = "Password updated successfully." });
         }
 
+        [Authorize("SuperAdmin")]
         [HttpDelete]
        
         public IActionResult DeleteUser([FromBody] int userId)

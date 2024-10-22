@@ -32,7 +32,7 @@ namespace Application.Services
             var existingUser = _userRepository.GetByEmail(userDto.Email);
             if (existingUser != null)
             {
-                throw new Exception("Email ya registrado. Por favor intente nuevamente");
+                throw new Exception("Email already registered. Please try again.");
             }
             return UserDto.ToDto(_userRepository.Create(UserCreateRequest.ToEntity(userDto)));
         }
@@ -42,7 +42,7 @@ namespace Application.Services
             var existingUser = _userRepository.GetByEmail(userDto.Email);
             if (existingUser != null)
             {
-                throw new Exception("Email ya registrado. Por favor intente nuevamente");
+                throw new Exception("Email already registered. Please try again.");
             }
             return UserDto.ToDto(_userRepository.Create(UserAdminCreateRequest.ToEntity(userDto)));
         }
@@ -61,7 +61,7 @@ namespace Application.Services
 
                 if (entity == null)
                 {
-                    throw new Exception("Usuario no encontrado.");
+                    throw new Exception("User not found.");
                 }
 
                 UserLoginRequest entityToAuthenticate = new();
@@ -84,7 +84,7 @@ namespace Application.Services
             User? user = _userRepository.Get(id);
             if (user == null)
             {
-                throw new Exception("No se encontró el usuario");
+                throw new Exception("User not found.");
             }
             user.Password = password;
             _userRepository.Update(user);
@@ -95,7 +95,7 @@ namespace Application.Services
             User? user = _userRepository.Get(id);
             if (user == null)
             {
-                throw new Exception("No se encontró el usuario");
+                throw new Exception("User not found.");
             }
             _userRepository.Delete(user);
         }

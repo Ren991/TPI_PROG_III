@@ -133,12 +133,12 @@ namespace Application.Services
             var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
             if (cart == null)
             {
-                throw new Exception("Carrito no encontrado.");
+                throw new Exception("Cart not found.");
             }
 
             if (cart.IsPayabled)
             {
-                throw new Exception("El carrito ya ha sido pagado.");
+                throw new Exception("The cart has already been paid for.");
             }
 
             // Cambiar la propiedad IsPayabled a true y asignar el método de pago

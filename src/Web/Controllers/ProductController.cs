@@ -32,56 +32,34 @@ namespace Web.Controllers
             return Ok(products);
         }
 
+        [Authorize(Roles= "SuperAdmin, Admin")]
         [HttpPost]
-        [Authorize]
-
+        
         public IActionResult AddProduct([FromBody] ProductCreateRequest product)
 
         {
-            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (userTypeString == "Admin")
-            {
                 var newProduct = _productService.AddNewProduct(product);
                 return Ok(newProduct);
-            }
-            else
-            {
-                return Forbid();
-            }
+        
         }
 
+        [Authorize("SuperAdmin")]
         [HttpDelete]
-        [Authorize]
 
         public IActionResult DeleteProduct([FromBody] int productId)
         {
-            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (userTypeString == "Admin")
-            {
-
-                _productService.DeleteProduct(productId);
+            _productService.DeleteProduct(productId);
             return Ok(new { message = "Product deleted successfully." });
-            }
-            else
-            {
-                return Forbid();
-            }
+            
         }
 
+        [Authorize(Roles = "SuperAdmin, Admin")]
         [HttpPut("{id}")]
-        [Authorize]
+        
         public IActionResult UpdateProduct(int id, [FromQuery] string description, [FromQuery] double price, [FromQuery] int stock)
         {
-            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (userTypeString == "Admin")
-            {
-                _productService.UpdateProduct(id, description, price, stock);
-                return Ok(new { message = "Producto actualizado exitosamente." });
-            }
-            else
-            {
-                return Forbid();
-            }
+            _productService.UpdateProduct(id, description, price, stock);
+            return Ok(new { message = "Product successfully updated." });
 
         }
 

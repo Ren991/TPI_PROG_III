@@ -24,7 +24,7 @@ namespace Web.Controllers
 
             if (token == null)
             {
-                throw new Exception("Usuario no autenticado.");
+                throw new Exception("Unauthenticated user.");
             }
             return Ok(token );
         }

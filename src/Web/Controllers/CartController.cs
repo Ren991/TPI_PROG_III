@@ -41,13 +41,13 @@ namespace Web.Controllers
             // Validar el valor de quantity
             if (quantity <= 0)
             {
-                return BadRequest("La cantidad debe ser mayor que 0.");
+                return BadRequest("The amount must be greater than 0.");
             }
 
             // Agregar el producto al carrito
             await _cartService.AddProductToCartAsync(userId, productId, quantity);
 
-            return Ok("Producto agregado al carrito.");
+            return Ok("Product added to cart.");
         }
 
         [Authorize]
@@ -59,7 +59,7 @@ namespace Web.Controllers
             // Verificar si userIdClaim es nulo o no se puede convertir a int
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized("Id de usuario no encontrado.");
+                return Unauthorized("User ID not found.");
             }
            
             await _cartService.RemoveProductFromCartAsync(userId, cartId, productId);
@@ -75,7 +75,7 @@ namespace Web.Controllers
             // Verificar si userIdClaim es nulo o no se puede convertir a int
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized("Id de usuario no encontrado.");
+                return Unauthorized("User ID not found.");
             }
             await _cartService.ClearCartAsync(userId, cartId);
             return NoContent();
@@ -90,7 +90,7 @@ namespace Web.Controllers
             // Verificar si userIdClaim es nulo o no se puede convertir a int
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized("Id de usuario no encontrado.");
+                return Unauthorized("User ID not found.");
             }
 
             var totalPrice = await _cartService.CalculateTotalPriceAsync(userId, cartId);
@@ -107,20 +107,20 @@ namespace Web.Controllers
             // Verificar si el userIdClaim es válido
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized("Id de usuario no encontrado.");
+                return Unauthorized("User ID not found.");
             }
 
             // Validar que el método de pago sea válido
             if (!Enum.IsDefined(typeof(TypePayment), paymentRequest.TypePayment))
             {
-                return BadRequest("Método de pago inválido.");
+                return BadRequest("Invalid payment method.");
             }
 
             // Llamar al servicio para realizar el pago del carrito con el método de pago seleccionado
             try
             {
                 await _cartService.PayCartAsync(userId, cartId, paymentRequest.TypePayment);
-                return Ok("Carrito pagado con éxito.");
+                return Ok("Cart successfully paid.");
             }
             catch (Exception ex)
             {
