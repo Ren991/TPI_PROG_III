@@ -17,25 +17,34 @@ namespace Web.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            context.Response.OnStarting(() =>
-            {
-                // Manejo para Forbidden antes de llamar al siguiente middleware
-                if (context.Response.StatusCode == (int)HttpStatusCode.Forbidden)
-                {
-                    var response = new { statusCode = context.Response.StatusCode, message = "Access to this resource is forbidden." };
-                    context.Response.ContentType = "application/json";
-                    var result = System.Text.Json.JsonSerializer.Serialize(response);
-                    return context.Response.WriteAsync(result);
-                }
-
-                return Task.CompletedTask;
-
-            });
-            
-
             try
             {
                 await _next(context);
+
+                // Status code 401 (No autorizado)
+                if (context.Response.StatusCode == (int)HttpStatusCode.Unauthorized)
+                {
+                    var response = new
+                    {
+                        statusCode = context.Response.StatusCode,
+                        message = "You are not authorized to access this resource. Please log in."
+                    };
+                    context.Response.ContentType = "application/json";
+                    var result = System.Text.Json.JsonSerializer.Serialize(response);
+                    await context.Response.WriteAsync(result);
+                }
+                // Status code 403 (Prohibido)
+                else if (context.Response.StatusCode == (int)HttpStatusCode.Forbidden)
+                {
+                    var response = new
+                    {
+                        statusCode = context.Response.StatusCode,
+                        message = "Access to this resource is forbidden."
+                    };
+                    context.Response.ContentType = "application/json";
+                    var result = System.Text.Json.JsonSerializer.Serialize(response);
+                    await context.Response.WriteAsync(result);
+                }
             }
             catch (Exception ex)
             {
@@ -72,6 +81,7 @@ namespace Web.Middlewares
             }
         }
     }
+
 
     public class ErrorResponse
     {

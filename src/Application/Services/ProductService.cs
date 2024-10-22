@@ -39,7 +39,7 @@ namespace Application.Services
             Product? product = _productRepository.Get(id);
             if (product == null)
             {
-                throw new Exception("No se encontró el producto");
+                throw new Exception("Product not found.");
             }
 
             product.Description = description;
@@ -55,7 +55,7 @@ namespace Application.Services
             
             if (product == null)
             {
-                throw new Exception("No se encontró el producto");
+                throw new Exception("Product not found.");
             }
             _productRepository.Delete(product);
         }

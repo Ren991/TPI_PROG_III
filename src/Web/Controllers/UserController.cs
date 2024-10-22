@@ -48,23 +48,8 @@ namespace Web.Controllers
         public IActionResult AddAdminUser([FromBody] UserAdminCreateRequest user) // Este endpoint es para crear usuario Admin.
 
         {
-
             var newUser = _userService.AddNewAdminUser(user);
             return Ok(newUser);
-
-            /*var roleClaim = User.FindFirst(ClaimTypes.Role); 
-            
-            if (roleClaim != null && roleClaim.Value == "SuperAdmin") 
-            {
-                var newUser = _userService.AddNewAdminUser(user);
-                return Ok(newUser); 
-            } 
-            else 
-            { 
-                return Unauthorized("El usuario no es un super administrador."); 
-            }*/
-
-
         }
 
         [Authorize(Roles = "SuperAdmin,Admin")]
@@ -75,17 +60,13 @@ namespace Web.Controllers
           return Ok(_userService.GetUserByEmail(email));
         }
 
+        [Authorize(Roles = "SuperAdmin,Admin,CommonUser")]
         [HttpPut("/password")]
         
         public IActionResult UpdateUser([FromBody] string password)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            //var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-            if (userIdClaim == null)
-            {
-                throw new Exception("Unauthenticated User.");
-            }
 
             if (!int.TryParse(userIdClaim.Value, out int userId))
             {
