@@ -60,7 +60,7 @@ namespace Infrastructure.Data
             });
 
             // Configuración de SaleLine
-            modelBuilder.Entity<SaleLine>(entity =>
+            modelBuilder.Entity<CartLine>(entity =>
             {
                 entity.HasKey(sl => sl.Id);
                 entity.Property(sl => sl.Id)

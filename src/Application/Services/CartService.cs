@@ -32,7 +32,7 @@ namespace Application.Services
         // Crear un nuevo carrito para un usuario
         public async Task<CartDto> CreateCartForUserAsync(int userId)
         {
-            var cart = new Cart { UserId = userId, SaleLineList = new List<SaleLine>(), TotalPrice = 0 };
+            var cart = new Cart { UserId = userId, SaleLineList = new List<CartLine>(), TotalPrice = 0 };
 
             var createdCart = await _cartRepository.CreateAsync(cart);
             return CartDto.ToDto(createdCart);
@@ -66,7 +66,7 @@ namespace Application.Services
             }
             else
             {
-                cart.SaleLineList.Add(new SaleLine
+                cart.SaleLineList.Add(new CartLine
                 {
                     ProductId = productId,
                     Product = product,
