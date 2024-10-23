@@ -21,7 +21,7 @@ namespace Infrastructure.Data
         public async Task<Cart> GetCartByIdAndUserIdAsync(int cartId, int userId)
         {
             return await _context.Carts
-                .Include(c => c.SaleLineList) // Incluir las líneas de venta del carrito
+                .Include(c => c.CartLineList) // Incluir las líneas de venta del carrito
                 .FirstOrDefaultAsync(c => c.Id == cartId && c.UserId == userId);
         }
 
@@ -29,7 +29,7 @@ namespace Infrastructure.Data
         public async Task<List<Cart>> GetCartByUserIdAsync(int userId)
         {
             return await _context.Carts
-                .Include(c => c.SaleLineList) // Incluir las líneas de venta de cada carrito
+                .Include(c => c.CartLineList) // Incluir las líneas de venta de cada carrito
                 .Where(c => c.UserId == userId)
                 .ToListAsync();
         }
@@ -53,7 +53,7 @@ namespace Infrastructure.Data
         public async Task<List<Cart>> GetPaidCartsByUserIdAsync(int userId)
         {
             return await _context.Carts
-                .Include(c => c.SaleLineList)
+                .Include(c => c.CartLineList)
                 .Where(cart => cart.IsPayabled && cart.UserId == userId)
                 .ToListAsync();
         }

@@ -18,6 +18,7 @@ using Infrastructure.Data;
 using Domain.Entities;
 using Application.Models.AuthDtos;
 using Domain.Enums;
+using Domain.Exceptions;
 
 namespace Infrastructure.Services
 {
@@ -50,14 +51,15 @@ namespace Infrastructure.Services
 
         public string AuthenticateAsync(UserLoginRequest authenticationRequest)
         {
-            try
-            {
+            //try
+            //{
                 //Paso 1: Validamos las credenciales
                 var user = ValidateUser(authenticationRequest); //Lo primero que hacemos es llamar a una función que valide los parámetros que enviamos.
 
                 if (user == null)
                 {
-                    throw new Exception("User authentication failed");
+                    throw new NotAllowedException("Unauthenticated user.");
+                    
                 }
 
 
@@ -87,11 +89,7 @@ namespace Infrastructure.Services
 
                 return tokenToReturn.ToString();
 
-            }
-            catch (Exception ex) {
-                throw new Exception(ex.Message);
-            }
-            
+                      
             
         }
 
@@ -101,7 +99,8 @@ namespace Infrastructure.Services
 
             if (entity == null)
             {
-                throw new Exception("User authentication failed");
+                return null;
+                
             }
 
             UserLoginRequest entityToAuthenticate = new();
@@ -121,7 +120,8 @@ namespace Infrastructure.Services
 
             if (user == null)
             {
-                throw new Exception("User authentication failed");
+                return null;
+
             }
 
 

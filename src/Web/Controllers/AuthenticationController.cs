@@ -1,5 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Models.AuthDtos;
+using Domain.Entities;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers
@@ -22,11 +24,7 @@ namespace Web.Controllers
         {
             string token = _customAuthenticationService.AuthenticateAsync(loginRequest);
 
-            if (token == null)
-            {
-                throw new Exception("Unauthenticated user.");
-            }
-            return Ok(token );
+            return Ok(token);
         }
     }
 }

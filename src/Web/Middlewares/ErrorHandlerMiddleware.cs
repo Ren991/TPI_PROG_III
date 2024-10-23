@@ -33,6 +33,7 @@ namespace Web.Middlewares
                     var result = System.Text.Json.JsonSerializer.Serialize(response);
                     await context.Response.WriteAsync(result);
                 }
+
                 // Status code 403 (Prohibido)
                 else if (context.Response.StatusCode == (int)HttpStatusCode.Forbidden)
                 {
