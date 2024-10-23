@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Exceptions;
 
 namespace Application.Services
 {
@@ -57,6 +58,13 @@ namespace Application.Services
 
             // Agregar el producto al carrito (código existente, adaptado)
             var product = _productRepository.Get(productId);
+
+            if (product.Stock < quantity) 
+            {
+                throw new NotAllowedException("Product out of stock.");
+            }
+
+
 
             var saleLine = cart.CartLineList.FirstOrDefault(sl => sl.ProductId == productId);
             if (saleLine != null)
