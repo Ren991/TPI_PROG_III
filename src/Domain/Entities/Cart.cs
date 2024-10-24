@@ -23,7 +23,5 @@ namespace Domain.Entities
 
         public User User { get; set; }
 
-        //public SaleLine SaleLine { get; set; }
-
     }
 }
