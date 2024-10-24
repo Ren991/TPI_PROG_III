@@ -2,6 +2,7 @@
 using Application.Models.ProductDtos;
 using Application.Models.UserDtos;
 using Domain.Entities;
+using Domain.Exceptions;
 using Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace Application.Services
             Product? product = _productRepository.Get(id);
             if (product == null)
             {
-                throw new Exception("Product not found.");
+                throw new NotFoundException("Product not found.");
             }
 
             product.Description = description;
@@ -55,7 +56,7 @@ namespace Application.Services
             
             if (product == null)
             {
-                throw new Exception("Product not found.");
+                throw new NotFoundException("Product not found.");
             }
             _productRepository.Delete(product);
         }

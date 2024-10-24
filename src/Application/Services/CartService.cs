@@ -141,12 +141,19 @@ namespace Application.Services
             var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
             if (cart == null)
             {
-                throw new Exception("Cart not found.");
+                throw new NotFoundException("Cart not found.");
             }
 
             if (cart.IsPayabled)
             {
-                throw new Exception("The cart has already been paid for.");
+                throw new BadRequestException("The cart has already been paid for.");
+            }
+
+            // Validar que el subtotal no sea 0 o menor
+            var subtotal = await CalculateTotalPriceAsync(userId, cartId);
+            if (subtotal <= 0)
+            {
+                throw new BadRequestException("The cart cannot be paid because the subtotal is 0.");
             }
 
             // Cambiar la propiedad IsPayabled a true y asignar el método de pago

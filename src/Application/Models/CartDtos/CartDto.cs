@@ -31,7 +31,7 @@ namespace Application.Models.CartDtos
             cartDto.TypePayment = cart.TypePayment;
             cartDto.IsPayabled = cart.IsPayabled;
             cartDto.UserId = cart.UserId;
-            cartDto.CartLineList = CartLineDto.ToCollectionDto(cart.CartLineList); // Assuming a separate SaleLineDto exists
+            cartDto.CartLineList = CartLineDto.ToCollectionDto(cart.CartLineList);
 
             return cartDto;
         }

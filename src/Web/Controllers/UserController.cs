@@ -3,6 +3,7 @@ using Application.Models.UserDtos;
 using Application.Services;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -70,7 +71,7 @@ namespace Web.Controllers
 
             if (!int.TryParse(userIdClaim.Value, out int userId))
             {
-                throw new Exception("Invalid user ID format.");
+                throw new BadRequestException("Invalid user ID format.");
             }
 
             _userService.UpdateUser(userId, password);
