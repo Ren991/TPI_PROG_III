@@ -20,11 +20,20 @@ namespace Web.Controllers
         }
 
         [Authorize]
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetCart(int userId)
+        [HttpGet("/get-carts-by-user")]
+        public async Task<IActionResult> GetCart()
         {
+            // Obtener el id del usuario logueado
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            // Verificar si userIdClaim es nulo o no se puede convertir a int
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                throw new NotFoundException("User ID is not valid.");
+            }
+
             var cart = await _cartService.GetCartsByUserIdAsync(userId);
-            return cart != null ? Ok(cart) : NotFound();
+            return cart != null ? Ok(cart) : throw new NotFoundException("User ID is not valid."); ;
         }
 
         [Authorize]
