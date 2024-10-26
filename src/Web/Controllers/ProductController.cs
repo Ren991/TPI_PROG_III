@@ -4,6 +4,7 @@ using Application.Models.UserDtos;
 using Application.Services;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +47,7 @@ namespace Web.Controllers
         [Authorize("SuperAdmin")]
         [HttpDelete]
 
-        public IActionResult DeleteProduct([FromBody] int productId)
+        public IActionResult DeleteProduct([FromQuery] int productId)
         {
             _productService.DeleteProduct(productId);
             return Ok(new { message = "Product deleted successfully." });
@@ -56,9 +57,14 @@ namespace Web.Controllers
         [Authorize(Roles = "SuperAdmin, Admin")]
         [HttpPut("{id}")]
         
-        public IActionResult UpdateProduct(int id, [FromQuery] string description, [FromQuery] double price, [FromQuery] int stock)
+        public IActionResult UpdateProduct(int id, ProductCreateRequest productDto)
         {
-            _productService.UpdateProduct(id, description, price, stock);
+            if (!ProductCreateRequest.validateDto(productDto)) 
+            {
+                throw new BadRequestException("Field or fields missing.");
+            }
+
+            _productService.UpdateProduct(id, productDto);
             return Ok(new { message = "Product successfully updated." });
 
         }

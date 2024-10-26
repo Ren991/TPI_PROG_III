@@ -87,14 +87,19 @@ namespace Application.Services
             _userRepository.Update(user);
         }
 
-        public void DeleteUser(int id)
+        public void DeleteUser(int userId) //BAJA LOGICA
         {
-            User? user = _userRepository.Get(id);
-            if (user == null)
+            var user = _userRepository.Get(userId);
+            if (user != null)
+            {
+                user.IsDeleted = true;
+                _userRepository.Update(user);
+            }
+            else 
             {
                 throw new NotFoundException("User not found.");
             }
-            _userRepository.Delete(user);
         }
+
     }
 }

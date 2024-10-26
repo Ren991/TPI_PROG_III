@@ -63,7 +63,7 @@ namespace Web.Controllers
 
         [Authorize]
         [HttpDelete("/remove-product/{productId}")]
-        public async Task<IActionResult> RemoveProductFromCart(int cartId, int productId)
+        public async Task<IActionResult> RemoveProductFromCart(int productId)
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
@@ -73,13 +73,13 @@ namespace Web.Controllers
                 throw new NotFoundException("User ID not found.");
             }
            
-            await _cartService.RemoveProductFromCartAsync(userId, cartId, productId);
+            await _cartService.RemoveProductFromCartAsync(userId, productId);
             return NoContent();
         }
 
         [Authorize]
         [HttpPost("/clear")]
-        public async Task<IActionResult> ClearCart(int cartId)
+        public async Task<IActionResult> ClearCart()
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
@@ -88,7 +88,7 @@ namespace Web.Controllers
             {
                 throw new NotFoundException("User ID not found.");
             }
-            await _cartService.ClearCartAsync(userId, cartId);
+            await _cartService.ClearCartAsync(userId);
             return NoContent();
         }
 

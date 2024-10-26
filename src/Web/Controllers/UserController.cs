@@ -80,9 +80,9 @@ namespace Web.Controllers
         }
 
         [Authorize("SuperAdmin")]
-        [HttpDelete]
+        [HttpDelete("{userId}")]
        
-        public IActionResult DeleteUser([FromBody] int userId)
+        public IActionResult DeleteUser([FromRoute] int userId)
         {
             
             _userService.DeleteUser(userId);

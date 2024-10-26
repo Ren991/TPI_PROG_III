@@ -43,6 +43,8 @@ namespace Infrastructure.Services
 
             if (user == null) return null;
 
+            if (user.IsDeleted == true) return null;
+
             if (authenticationRequest.Email == user.Email && user.Password == authenticationRequest.Password) return user;
 
             return null;

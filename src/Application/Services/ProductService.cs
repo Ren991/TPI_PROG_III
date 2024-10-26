@@ -35,7 +35,7 @@ namespace Application.Services
 
 
 
-        public void UpdateProduct(int id, string description, double price, int stock)
+        public void UpdateProduct(int id, ProductCreateRequest productDto)
         {
             Product? product = _productRepository.Get(id);
             if (product == null)
@@ -43,9 +43,11 @@ namespace Application.Services
                 throw new NotFoundException("Product not found.");
             }
 
-            product.Description = description;
-            product.Price = price;
-            product.Stock = stock;
+            product.Name = productDto.Name;
+            product.Description = productDto.Description;
+            product.Price = productDto.Price;
+            product.Stock = productDto.Stock;
+            product.Category = productDto.Category;
 
             _productRepository.Update(product);
         }
