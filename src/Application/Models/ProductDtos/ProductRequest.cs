@@ -39,6 +39,7 @@ namespace Application.Models.ProductDtos
             product.Description = productDto.Description;
             product.Image = productDto.Image;
             product.Category = productDto.Category;
+            product.IsDeleted = false;
 
             return product;
 

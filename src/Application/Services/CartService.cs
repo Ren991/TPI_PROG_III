@@ -23,13 +23,6 @@ namespace Application.Services
             _productRepository = productRepository;
         }
 
-        // Obtener carrito por CartId y UserId
-        public async Task<CartDto> GetCartByIdAndUserIdAsync(int cartId, int userId)
-        {
-            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
-            return CartDto.ToDto(cart);
-        }
-
         // Crear un nuevo carrito para un usuario
         public async Task<CartDto> CreateCartForUserAsync(int userId)
         {
@@ -59,7 +52,7 @@ namespace Application.Services
             // Agregar el producto al carrito (código existente, adaptado)
             var product = _productRepository.Get(productId);
 
-            if (product == null || product.Stock < quantity) 
+            if (product == null || product.IsDeleted == true || product.Stock < quantity) 
             {
                 throw new NotAllowedException("Product out of stock or product not found.");
             }
@@ -148,10 +141,16 @@ namespace Application.Services
         }
 
         // Calcular el precio total de un carrito específico del usuario
-        public async Task<double> CalculateTotalPriceAsync(int userId, int cartId)
+        public async Task<double> CalculateTotalPriceAsync(int userId)
         {
-            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
-            return cart?.CartLineList.Sum(sl => sl.SubtotalPrice) ?? 0;
+            // Obtener todos los carritos del usuario
+            var carts = await _cartRepository.GetCartByUserIdAsync(userId);
+
+            // Buscar el primer carrito no pagado
+            var cartToPay = carts.FirstOrDefault(c => !c.IsPayabled);
+
+     
+            return cartToPay?.CartLineList.Sum(sl => sl.SubtotalPrice) ?? 0;
         }
 
         // Obtener todos los carritos de un usuario
@@ -164,10 +163,15 @@ namespace Application.Services
             return cartDtos;        
         }
 
-        public async Task PayCartAsync(int userId, int cartId, TypePayment typePayment)
+        public async Task PayCartAsync(int userId, TypePayment typePayment)
         {
-            // Buscar el carrito del usuario
-            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
+            // Obtener todos los carritos del usuario
+            var carts = await _cartRepository.GetCartByUserIdAsync(userId);
+
+            // Buscar el primer carrito no pagado
+            var cart = carts.FirstOrDefault(c => !c.IsPayabled);
+
+
             if (cart == null)
             {
                 throw new NotFoundException("Cart not found.");
@@ -179,7 +183,7 @@ namespace Application.Services
             }
 
             // Validar que el subtotal no sea 0 o menor
-            var subtotal = await CalculateTotalPriceAsync(userId, cartId);
+            var subtotal = await CalculateTotalPriceAsync(userId);
             if (subtotal <= 0)
             {
                 throw new BadRequestException("The cart cannot be paid because the subtotal is 0.");

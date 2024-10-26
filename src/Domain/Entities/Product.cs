@@ -32,5 +32,7 @@ namespace Domain.Entities
         [Required]
         public string Category { get; set; }
 
+        public bool IsDeleted { get; set; } = false; //Valor por defecto en falso ("producto activo")
+
     }
 }

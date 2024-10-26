@@ -54,13 +54,19 @@ namespace Application.Services
 
         public void DeleteProduct(int id)
         {
+
             Product? product = _productRepository.Get(id);
             
-            if (product == null)
+            if (product != null)
+            {
+                product.IsDeleted = true;
+                _productRepository.Update(product);
+            }
+            else
             {
                 throw new NotFoundException("Product not found.");
             }
-            _productRepository.Delete(product);
+            
         }
     }
 }

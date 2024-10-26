@@ -11,14 +11,13 @@ namespace Application.Interfaces
 {
     public interface ICartService
     {
-        Task<CartDto> GetCartByIdAndUserIdAsync(int cartId, int userId);
         Task<CartDto> CreateCartForUserAsync(int userId);
         Task<List<CartDto>> GetPaidCartsByUserIdAsync(int userId);
         Task AddProductToCartAsync(int userId, int productId, int quantity);
         Task RemoveProductFromCartAsync(int userId, int productId);
         Task ClearCartAsync(int userId);
-        Task<double> CalculateTotalPriceAsync(int userId, int cartId);
-        Task PayCartAsync(int userId, int cartId, TypePayment typePayment);
+        Task<double> CalculateTotalPriceAsync(int userId);
+        Task PayCartAsync(int userId, TypePayment typePayment);
         Task<List<CartDto>> GetCartsByUserIdAsync(int userId);
     }
 }

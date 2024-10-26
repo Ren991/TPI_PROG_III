@@ -18,13 +18,6 @@ namespace Infrastructure.Data
             _context = context;
         }
 
-        public async Task<Cart> GetCartByIdAndUserIdAsync(int cartId, int userId)
-        {
-            return await _context.Carts
-                .Include(c => c.CartLineList) // Incluir las líneas de venta del carrito
-                .FirstOrDefaultAsync(c => c.Id == cartId && c.UserId == userId);
-        }
-
         // Obtener todos los carritos de un usuario por userId
         public async Task<List<Cart>> GetCartByUserIdAsync(int userId)
         {

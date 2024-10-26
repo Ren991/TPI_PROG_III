@@ -94,7 +94,7 @@ namespace Web.Controllers
 
         [Authorize]
         [HttpGet("/cart/total-price")]
-        public async Task<IActionResult> CalculateTotalPrice( int cartId)
+        public async Task<IActionResult> CalculateTotalPrice()
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
@@ -104,13 +104,13 @@ namespace Web.Controllers
                 throw new NotFoundException("User ID not found.");
             }
 
-            var totalPrice = await _cartService.CalculateTotalPriceAsync(userId, cartId);
+            var totalPrice = await _cartService.CalculateTotalPriceAsync(userId);
             return Ok(totalPrice);
         }
 
         [Authorize]
-        [HttpPost("{cartId}/pay")]
-        public async Task<IActionResult> PayCart(int cartId, [FromBody] PaymentRequest paymentRequest)
+        [HttpPost("/pay")]
+        public async Task<IActionResult> PayCart([FromBody] PaymentRequest paymentRequest)
         {
             // Obtener el id del usuario logueado desde los claims
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -128,7 +128,7 @@ namespace Web.Controllers
             }
 
             // Llamar al servicio para realizar el pago del carrito con el método de pago seleccionado
-             await _cartService.PayCartAsync(userId, cartId, paymentRequest.TypePayment);
+             await _cartService.PayCartAsync(userId, paymentRequest.TypePayment);
              return Ok("Cart successfully paid.");
             
         }

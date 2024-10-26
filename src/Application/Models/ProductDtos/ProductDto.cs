@@ -23,6 +23,8 @@ namespace Application.Models.ProductDtos
 
         public string Category { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public static ProductDto ToDto(Product product)
         {
             ProductDto productDto = new();
@@ -31,7 +33,8 @@ namespace Application.Models.ProductDtos
             productDto.Price = product.Price;
             productDto.Description = product.Description;
             productDto.Image = product.Image;
-            productDto.Category = product.Category; 
+            productDto.Category = product.Category;
+            productDto.IsDeleted = product.IsDeleted;
 
             return productDto;
 
