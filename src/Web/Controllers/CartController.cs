@@ -1,9 +1,12 @@
 ﻿using Application.Interfaces;
 using Application.Models.CartDtos;
 using Domain.Enums;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ServiceStack;
 using System.Security.Claims;
+using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace Web.Controllers
 {
@@ -18,12 +21,32 @@ namespace Web.Controllers
             _cartService = cartService;
         }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetCart(int userId)
+        [Authorize]
+        [HttpGet("/get-carts-by-user")]
+        public async Task<IActionResult> GetCart()
         {
+            // Obtener el id del usuario logueado
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            // Verificar si userIdClaim es nulo o no se puede convertir a int
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                throw new NotFoundException("User ID is not valid.");
+            }
+
             var cart = await _cartService.GetCartsByUserIdAsync(userId);
-            return cart != null ? Ok(cart) : NotFound();
+            return cart != null ? Ok(cart) : throw new NotFoundException("User ID is not valid."); ;
         }
+
+        [Authorize(Roles = "SuperAdmin, Admin")]
+        [HttpGet("/get-all-carts")]
+        public async Task<IActionResult> GetAllCarts()
+        {
+            var carts = await _cartService.GetAllCarts();
+            return Ok(carts);
+
+        }
+
 
         [Authorize]
         [HttpPost("/add-product/{productId}")]
@@ -35,71 +58,71 @@ namespace Web.Controllers
             // Verificar si userIdClaim es nulo o no se puede convertir a int
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized("User ID is not valid.");
+                throw new NotFoundException("User ID is not valid.");
             }
 
             // Validar el valor de quantity
             if (quantity <= 0)
             {
-                return BadRequest("La cantidad debe ser mayor que 0.");
+                throw new BadRequestException("The amount must be greater than 0.");
             }
 
             // Agregar el producto al carrito
             await _cartService.AddProductToCartAsync(userId, productId, quantity);
 
-            return Ok("Producto agregado al carrito.");
+            return Ok("Product added to cart.");
         }
 
         [Authorize]
         [HttpDelete("/remove-product/{productId}")]
-        public async Task<IActionResult> RemoveProductFromCart(int cartId, int productId)
+        public async Task<IActionResult> RemoveProductFromCart(int productId)
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             // Verificar si userIdClaim es nulo o no se puede convertir a int
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized("Id de usuario no encontrado.");
+                throw new NotFoundException("User ID not found.");
             }
            
-            await _cartService.RemoveProductFromCartAsync(userId, cartId, productId);
+            await _cartService.RemoveProductFromCartAsync(userId, productId);
             return NoContent();
         }
 
         [Authorize]
         [HttpPost("/clear")]
-        public async Task<IActionResult> ClearCart(int cartId)
+        public async Task<IActionResult> ClearCart()
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             // Verificar si userIdClaim es nulo o no se puede convertir a int
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized("Id de usuario no encontrado.");
+                throw new NotFoundException("User ID not found.");
             }
-            await _cartService.ClearCartAsync(userId, cartId);
+            await _cartService.ClearCartAsync(userId);
             return NoContent();
         }
 
         [Authorize]
         [HttpGet("/cart/total-price")]
-        public async Task<IActionResult> CalculateTotalPrice( int cartId)
+        public async Task<IActionResult> CalculateTotalPrice()
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             // Verificar si userIdClaim es nulo o no se puede convertir a int
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized("Id de usuario no encontrado.");
+                throw new NotFoundException("User ID not found.");
             }
 
-            var totalPrice = await _cartService.CalculateTotalPriceAsync(userId, cartId);
+            var totalPrice = await _cartService.CalculateTotalPriceAsync(userId);
             return Ok(totalPrice);
         }
 
         [Authorize]
-        [HttpPost("{cartId}/pay")]
-        public async Task<IActionResult> PayCart(int cartId, [FromBody] PaymentRequest paymentRequest)
+        [HttpPost("/pay")]
+        public async Task<IActionResult> PayCart([FromBody] PaymentRequest paymentRequest)
         {
             // Obtener el id del usuario logueado desde los claims
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -107,26 +130,19 @@ namespace Web.Controllers
             // Verificar si el userIdClaim es válido
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized("Id de usuario no encontrado.");
+                throw new UnauthorizedException("User ID not found.");
             }
 
             // Validar que el método de pago sea válido
             if (!Enum.IsDefined(typeof(TypePayment), paymentRequest.TypePayment))
             {
-                return BadRequest("Método de pago inválido.");
+                throw new BadRequestException("Invalid payment method.");
             }
 
             // Llamar al servicio para realizar el pago del carrito con el método de pago seleccionado
-            try
-            {
-                await _cartService.PayCartAsync(userId, cartId, paymentRequest.TypePayment);
-                return Ok("Carrito pagado con éxito.");
-            }
-            catch (Exception ex)
-            {
-                // Manejar el error si el carrito no se encuentra
-                return BadRequest(ex.Message);
-            }
+             await _cartService.PayCartAsync(userId, paymentRequest.TypePayment);
+             return Ok("Cart successfully paid.");
+            
         }
 
         [Authorize]
@@ -138,7 +154,7 @@ namespace Web.Controllers
             // Verificar si userIdClaim es nulo o no se puede convertir a int
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized("User ID is not valid.");
+                throw new NotFoundException("User ID is not valid.");
             }
 
             var paidCarts = await _cartService.GetPaidCartsByUserIdAsync(userId);

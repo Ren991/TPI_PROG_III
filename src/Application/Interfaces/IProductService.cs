@@ -14,7 +14,7 @@ namespace Application.Interfaces
         List<Product> GetAllProducts();
         ProductDto AddNewProduct(ProductCreateRequest productDto);
 
-        void UpdateProduct(int id, string description, double price, int stock);
+        void UpdateProduct(int id, ProductCreateRequest productDto);
 
         void DeleteProduct(int id);
     }

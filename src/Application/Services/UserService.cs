@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Models.UserDtos;
+using Domain.Exceptions;
 
 namespace Application.Services
 {
@@ -32,7 +33,7 @@ namespace Application.Services
             var existingUser = _userRepository.GetByEmail(userDto.Email);
             if (existingUser != null)
             {
-                throw new Exception("Email ya registrado. Por favor intente nuevamente");
+                throw new BadRequestException("Email already registered. Please try again.");
             }
             return UserDto.ToDto(_userRepository.Create(UserCreateRequest.ToEntity(userDto)));
         }
@@ -42,7 +43,7 @@ namespace Application.Services
             var existingUser = _userRepository.GetByEmail(userDto.Email);
             if (existingUser != null)
             {
-                throw new Exception("Email ya registrado. Por favor intente nuevamente");
+                throw new BadRequestException("Email already registered. Please try again.");
             }
             return UserDto.ToDto(_userRepository.Create(UserAdminCreateRequest.ToEntity(userDto)));
         }
@@ -55,13 +56,12 @@ namespace Application.Services
 
         public UserLoginRequest GetUserToAuthenticate(string email)
         {
-            try
-            {
+            
                 UserDto entity = GetUserByEmail(email);
 
                 if (entity == null)
                 {
-                    throw new Exception("Usuario no encontrado.");
+                    throw new NotFoundException("User not found.");
                 }
 
                 UserLoginRequest entityToAuthenticate = new();
@@ -71,10 +71,7 @@ namespace Application.Services
 
                 return entityToAuthenticate;
 
-            }catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            
             
         }
 
@@ -84,20 +81,25 @@ namespace Application.Services
             User? user = _userRepository.Get(id);
             if (user == null)
             {
-                throw new Exception("No se encontró el usuario");
+                throw new NotFoundException("User not found.");
             }
             user.Password = password;
             _userRepository.Update(user);
         }
 
-        public void DeleteUser(int id)
+        public void DeleteUser(int userId) //BAJA LOGICA
         {
-            User? user = _userRepository.Get(id);
-            if (user == null)
+            var user = _userRepository.Get(userId);
+            if (user != null)
             {
-                throw new Exception("No se encontró el usuario");
+                user.IsDeleted = true;
+                _userRepository.Update(user);
             }
-            _userRepository.Delete(user);
+            else 
+            {
+                throw new NotFoundException("User not found.");
+            }
         }
+
     }
 }

@@ -14,8 +14,8 @@ namespace Application.Models.UserDtos
     {
         public string Name { get; set; }
 
-        public string LastName { get; set; }    
-        [EmailAddress]
+        public string LastName { get; set; }
+
         public string Email { get; set; }
 
         public string Password { get; set; }
@@ -23,6 +23,8 @@ namespace Application.Models.UserDtos
         public Role Role { get; set; }
 
         public ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
+        public bool IsDeleted { get; set; }
 
         public static UserDto ToDto(User user)
         {
@@ -33,6 +35,7 @@ namespace Application.Models.UserDtos
             userDto.Password = user.Password;
             userDto.Role = user.Role;
             userDto.Carts = user.Carts;
+            userDto.IsDeleted = user.IsDeleted;
 
             return userDto;
 

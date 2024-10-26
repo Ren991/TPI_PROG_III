@@ -53,14 +53,14 @@ namespace Infrastructure.Data
                       .OnDelete(DeleteBehavior.Cascade);  // Borrar los carritos si se borra el usuario
 
                 // Relación uno a muchos entre Cart y SaleLine
-                entity.HasMany(c => c.SaleLineList)
+                entity.HasMany(c => c.CartLineList)
                       .WithOne(sl => sl.Cart)
                       .HasForeignKey(sl => sl.CartId)
                       .OnDelete(DeleteBehavior.Cascade);  // Borrar las líneas de venta si se borra el carrito
             });
 
             // Configuración de SaleLine
-            modelBuilder.Entity<SaleLine>(entity =>
+            modelBuilder.Entity<CartLine>(entity =>
             {
                 entity.HasKey(sl => sl.Id);
                 entity.Property(sl => sl.Id)
@@ -74,7 +74,7 @@ namespace Infrastructure.Data
 
                 // Relación muchos a uno entre SaleLine y Cart
                 entity.HasOne(sl => sl.Cart)
-                      .WithMany(c => c.SaleLineList)
+                      .WithMany(c => c.CartLineList)
                       .HasForeignKey(sl => sl.CartId);
             });
 

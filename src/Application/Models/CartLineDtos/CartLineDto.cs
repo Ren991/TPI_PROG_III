@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Models.SaleLineDtos
 {
-    public class SaleLineDto
+    public class CartLineDto
     {
         public string Id { get; set; }
 
@@ -19,9 +19,9 @@ namespace Application.Models.SaleLineDtos
 
         public int CartId { get; set; }
 
-        public static SaleLineDto ToDto(SaleLine saleLine)
+        public static CartLineDto ToDto(CartLine saleLine)
         {
-            SaleLineDto saleLineDto = new SaleLineDto();
+            CartLineDto saleLineDto = new CartLineDto();
             saleLineDto.Id = saleLine.Id;
             saleLineDto.ProductId = saleLine.ProductId;
             saleLineDto.SubtotalPrice = saleLine.SubtotalPrice;
@@ -31,7 +31,7 @@ namespace Application.Models.SaleLineDtos
             return saleLineDto;
         }
 
-        public static ICollection<SaleLineDto> ToCollectionDto(ICollection<SaleLine> saleLines)
+        public static ICollection<CartLineDto> ToCollectionDto(ICollection<CartLine> saleLines)
         {
             return saleLines.Select(sl => ToDto(sl)).ToList();
         }

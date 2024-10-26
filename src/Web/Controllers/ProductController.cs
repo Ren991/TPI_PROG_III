@@ -4,6 +4,7 @@ using Application.Models.UserDtos;
 using Application.Services;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,56 +33,39 @@ namespace Web.Controllers
             return Ok(products);
         }
 
+        [Authorize(Roles= "SuperAdmin, Admin")]
         [HttpPost]
-        [Authorize]
-
+        
         public IActionResult AddProduct([FromBody] ProductCreateRequest product)
 
         {
-            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (userTypeString == "Admin")
-            {
                 var newProduct = _productService.AddNewProduct(product);
                 return Ok(newProduct);
-            }
-            else
-            {
-                return Forbid();
-            }
+        
         }
 
+        [Authorize("SuperAdmin")]
         [HttpDelete]
-        [Authorize]
 
-        public IActionResult DeleteProduct([FromBody] int productId)
+        public IActionResult DeleteProduct([FromQuery] int productId)
         {
-            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (userTypeString == "Admin")
-            {
-
-                _productService.DeleteProduct(productId);
+            _productService.DeleteProduct(productId);
             return Ok(new { message = "Product deleted successfully." });
-            }
-            else
-            {
-                return Forbid();
-            }
+            
         }
 
+        [Authorize(Roles = "SuperAdmin, Admin")]
         [HttpPut("{id}")]
-        [Authorize]
-        public IActionResult UpdateProduct(int id, [FromQuery] string description, [FromQuery] double price, [FromQuery] int stock)
+        
+        public IActionResult UpdateProduct(int id, ProductCreateRequest productDto)
         {
-            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (userTypeString == "Admin")
+            if (!ProductCreateRequest.validateDto(productDto)) 
             {
-                _productService.UpdateProduct(id, description, price, stock);
-                return Ok(new { message = "Producto actualizado exitosamente." });
+                throw new BadRequestException("Field or fields missing.");
             }
-            else
-            {
-                return Forbid();
-            }
+
+            _productService.UpdateProduct(id, productDto);
+            return Ok(new { message = "Product successfully updated." });
 
         }
 

@@ -18,9 +18,6 @@ namespace Application.Models.UserDtos
 
         public string Password { get; set; }
 
-        //public Role Role { get; set; }
-
-
         public static User ToEntity(UserAdminCreateRequest userDto)
         {
             User user = new User();

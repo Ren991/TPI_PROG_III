@@ -9,7 +9,7 @@ namespace Domain.Entities
 {
     public class Cart
     {
-        public ICollection<SaleLine> SaleLineList { get; set; } = new List<SaleLine>();
+        public ICollection<CartLine> CartLineList { get; set; } = new List<CartLine>();
 
         public int Id { get; set; }
 
@@ -22,8 +22,6 @@ namespace Domain.Entities
         public int UserId { get; set; } // Esta es la clave foránea que conecta con User
 
         public User User { get; set; }
-
-        //public SaleLine SaleLine { get; set; }
 
     }
 }

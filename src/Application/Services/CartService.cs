@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Exceptions;
 
 namespace Application.Services
 {
@@ -22,17 +23,24 @@ namespace Application.Services
             _productRepository = productRepository;
         }
 
-        // Obtener carrito por CartId y UserId
-        public async Task<CartDto> GetCartByIdAndUserIdAsync(int cartId, int userId)
+        //Listado de carritos
+        public async Task<List<CartDto>> GetAllCarts()
         {
-            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
-            return CartDto.ToDto(cart);
+            var carts = await _cartRepository.GetAllCarts();
+
+            var cartDtos = carts.Select(cart => CartDto.ToDto(cart)).ToList();
+
+            if (cartDtos == null)
+            {
+                throw new NotFoundException("Carts not found");
+            }
+            return cartDtos;
         }
 
         // Crear un nuevo carrito para un usuario
         public async Task<CartDto> CreateCartForUserAsync(int userId)
         {
-            var cart = new Cart { UserId = userId, SaleLineList = new List<SaleLine>(), TotalPrice = 0 };
+            var cart = new Cart { UserId = userId, CartLineList = new List<CartLine>(), TotalPrice = 0 };
 
             var createdCart = await _cartRepository.CreateAsync(cart);
             return CartDto.ToDto(createdCart);
@@ -58,7 +66,14 @@ namespace Application.Services
             // Agregar el producto al carrito (código existente, adaptado)
             var product = _productRepository.Get(productId);
 
-            var saleLine = cart.SaleLineList.FirstOrDefault(sl => sl.ProductId == productId);
+            if (product == null || product.IsDeleted == true || product.Stock < quantity) 
+            {
+                throw new NotAllowedException("Product out of stock or product not found.");
+            }
+
+
+
+            var saleLine = cart.CartLineList.FirstOrDefault(sl => sl.ProductId == productId);
             if (saleLine != null)
             {
                 saleLine.Quantity += quantity;
@@ -66,7 +81,7 @@ namespace Application.Services
             }
             else
             {
-                cart.SaleLineList.Add(new SaleLine
+                cart.CartLineList.Add(new CartLine
                 {
                     ProductId = productId,
                     Product = product,
@@ -76,45 +91,80 @@ namespace Application.Services
             }
 
             // Recalcular el TotalPrice del carrito
-            cart.TotalPrice = cart.SaleLineList.Sum(sl => sl.SubtotalPrice);
+            cart.TotalPrice = cart.CartLineList.Sum(sl => sl.SubtotalPrice);
 
             // Actualizar el carrito en la base de datos
             await _cartRepository.UpdateAsync(cart);
         }
 
         // Eliminar un producto del carrito específico del usuario
-        public async Task RemoveProductFromCartAsync(int userId, int cartId, int productId)
+        public async Task RemoveProductFromCartAsync(int userId, int productId)
         {
-            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
+            // Obtener todos los carritos del usuario
+            var carts = await _cartRepository.GetCartByUserIdAsync(userId);
+
+            // Buscar el primer carrito no pagado
+            var cart = carts.FirstOrDefault(c => !c.IsPayabled);
+
+            //var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
+            var product = _productRepository.Get(productId);
+
+            if (product == null) 
+            {
+                throw new NotFoundException("Product not found.");
+            }
+                
             if (cart != null)
             {
-                var saleLine = cart.SaleLineList.FirstOrDefault(sl => sl.ProductId == productId);
+                var saleLine = cart.CartLineList.FirstOrDefault(sl => sl.ProductId == productId);
                 if (saleLine != null)
                 {
-                    cart.SaleLineList.Remove(saleLine);
-                    cart.TotalPrice = cart.SaleLineList.Sum(sl => sl.SubtotalPrice);
+                    cart.CartLineList.Remove(saleLine);
+                    cart.TotalPrice = cart.CartLineList.Sum(sl => sl.SubtotalPrice);
                     await _cartRepository.UpdateAsync(cart);
                 }
             }
+            else
+            {
+                throw new NotFoundException("Carts not found.");
+            }
+
         }
 
         // Vaciar un carrito específico del usuario
-        public async Task ClearCartAsync(int userId, int cartId)
+        public async Task ClearCartAsync(int userId)
         {
-            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
+            // Obtener todos los carritos del usuario
+            var carts = await _cartRepository.GetCartByUserIdAsync(userId);
+
+            // Buscar el primer carrito no pagado
+            var cart = carts.FirstOrDefault(c => !c.IsPayabled);
+
+
+            //var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
             if (cart != null)
             {
-                cart.SaleLineList.Clear();
+                cart.CartLineList.Clear();
                 cart.TotalPrice = 0;
                 await _cartRepository.UpdateAsync(cart);
+            }
+            else
+            {
+                throw new NotFoundException("Cart not found.");
             }
         }
 
         // Calcular el precio total de un carrito específico del usuario
-        public async Task<double> CalculateTotalPriceAsync(int userId, int cartId)
+        public async Task<double> CalculateTotalPriceAsync(int userId)
         {
-            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
-            return cart?.SaleLineList.Sum(sl => sl.SubtotalPrice) ?? 0;
+            // Obtener todos los carritos del usuario
+            var carts = await _cartRepository.GetCartByUserIdAsync(userId);
+
+            // Buscar el primer carrito no pagado
+            var cartToPay = carts.FirstOrDefault(c => !c.IsPayabled);
+
+     
+            return cartToPay?.CartLineList.Sum(sl => sl.SubtotalPrice) ?? 0;
         }
 
         // Obtener todos los carritos de un usuario
@@ -127,18 +177,30 @@ namespace Application.Services
             return cartDtos;        
         }
 
-        public async Task PayCartAsync(int userId, int cartId, TypePayment typePayment)
+        public async Task PayCartAsync(int userId, TypePayment typePayment)
         {
-            // Buscar el carrito del usuario
-            var cart = await _cartRepository.GetCartByIdAndUserIdAsync(cartId, userId);
+            // Obtener todos los carritos del usuario
+            var carts = await _cartRepository.GetCartByUserIdAsync(userId);
+
+            // Buscar el primer carrito no pagado
+            var cart = carts.FirstOrDefault(c => !c.IsPayabled);
+
+
             if (cart == null)
             {
-                throw new Exception("Carrito no encontrado.");
+                throw new NotFoundException("Cart not found.");
             }
 
             if (cart.IsPayabled)
             {
-                throw new Exception("El carrito ya ha sido pagado.");
+                throw new BadRequestException("The cart has already been paid for.");
+            }
+
+            // Validar que el subtotal no sea 0 o menor
+            var subtotal = await CalculateTotalPriceAsync(userId);
+            if (subtotal <= 0)
+            {
+                throw new BadRequestException("The cart cannot be paid because the subtotal is 0.");
             }
 
             // Cambiar la propiedad IsPayabled a true y asignar el método de pago
@@ -148,7 +210,7 @@ namespace Application.Services
             // Guardar los cambios en el repositorio
             await _cartRepository.UpdateAsync(cart);
 
-            foreach (var saleLine in cart.SaleLineList)
+            foreach (var saleLine in cart.CartLineList)
             {
                 var product =  _productRepository.Get(saleLine.ProductId); 
                 if (product != null)

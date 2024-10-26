@@ -10,12 +10,13 @@ namespace Domain.Interfaces
 {
     public interface ICartRepository
     {
-        Task<Cart> GetCartByIdAndUserIdAsync(int cartId, int userId);
         Task<List<Cart>> GetCartByUserIdAsync(int userId);
         Task<Cart> CreateAsync(Cart cart);        
         Task<Cart> UpdateAsync(Cart cart);
 
         Task<List<Cart>> GetPaidCartsByUserIdAsync(int userId);
+
+        Task<List<Cart>> GetAllCarts();
 
     }
 }

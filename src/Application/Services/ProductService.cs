@@ -2,6 +2,7 @@
 using Application.Models.ProductDtos;
 using Application.Models.UserDtos;
 using Domain.Entities;
+using Domain.Exceptions;
 using Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -34,30 +35,38 @@ namespace Application.Services
 
 
 
-        public void UpdateProduct(int id, string description, double price, int stock)
+        public void UpdateProduct(int id, ProductCreateRequest productDto)
         {
             Product? product = _productRepository.Get(id);
             if (product == null)
             {
-                throw new Exception("No se encontró el producto");
+                throw new NotFoundException("Product not found.");
             }
 
-            product.Description = description;
-            product.Price = price;
-            product.Stock = stock;
+            product.Name = productDto.Name;
+            product.Description = productDto.Description;
+            product.Price = productDto.Price;
+            product.Stock = productDto.Stock;
+            product.Category = productDto.Category;
 
             _productRepository.Update(product);
         }
 
         public void DeleteProduct(int id)
         {
+
             Product? product = _productRepository.Get(id);
             
-            if (product == null)
+            if (product != null)
             {
-                throw new Exception("No se encontró el producto");
+                product.IsDeleted = true;
+                _productRepository.Update(product);
             }
-            _productRepository.Delete(product);
+            else
+            {
+                throw new NotFoundException("Product not found.");
+            }
+            
         }
     }
 }

@@ -12,6 +12,7 @@ using static Infrastructure.Services.AuthenticationService;
 using System.Text;
 using System.Text.Json.Serialization;
 using Infrastructure.Services;
+using Web.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,6 +79,7 @@ builder.Services.AddAuthentication("Bearer") //"Bearer" es el tipo de auntentica
 
 builder.Services.AddAuthorization(options =>
 {
+    options.AddPolicy("SuperAdmin", policy => policy.RequireRole("SuperAdmin"));
     options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
     options.AddPolicy("CommonUser", policy => policy.RequireRole("CommonUser"));
 });
@@ -101,11 +103,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ErrorHandlerMiddleware>();
+
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+app.UseAuthentication();
 
-//app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

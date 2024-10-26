@@ -21,7 +21,7 @@ namespace Application.Models.CartDtos
 
         public int UserId { get; set; }
 
-        public ICollection<SaleLineDto> SaleLineList { get; set; } = new List<SaleLineDto>();
+        public ICollection<CartLineDto> CartLineList { get; set; } = new List<CartLineDto>();
 
         public static CartDto ToDto(Cart cart)
         {
@@ -31,7 +31,7 @@ namespace Application.Models.CartDtos
             cartDto.TypePayment = cart.TypePayment;
             cartDto.IsPayabled = cart.IsPayabled;
             cartDto.UserId = cart.UserId;
-            cartDto.SaleLineList = SaleLineDto.ToCollectionDto(cart.SaleLineList); // Assuming a separate SaleLineDto exists
+            cartDto.CartLineList = CartLineDto.ToCollectionDto(cart.CartLineList);
 
             return cartDto;
         }

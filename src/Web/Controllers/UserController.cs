@@ -3,6 +3,7 @@ using Application.Models.UserDtos;
 using Application.Services;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,7 @@ namespace Web.Controllers
             _userService = userService;
         }
 
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet]
         
         public IActionResult GetAll()
@@ -41,29 +43,17 @@ namespace Web.Controllers
             return Ok(newUser);            
         }
 
-        [Authorize]
+        [Authorize("SuperAdmin")]
         [HttpPost("/create-admin")]
 
         public IActionResult AddAdminUser([FromBody] UserAdminCreateRequest user) // Este endpoint es para crear usuario Admin.
 
         {
-
-            var roleClaim = User.FindFirst(ClaimTypes.Role); 
-            
-            if (roleClaim != null && roleClaim.Value == "SuperAdmin") 
-            {
-                var newUser = _userService.AddNewAdminUser(user);
-                return Ok(newUser); 
-            } 
-            else 
-            { 
-                return Unauthorized("El usuario no es un super administrador."); 
-            }
-
-
+            var newUser = _userService.AddNewAdminUser(user);
+            return Ok(newUser);
         }
 
-
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet("/email")]
         
         public IActionResult GetByEmail([FromQuery] string email)
@@ -71,21 +61,17 @@ namespace Web.Controllers
           return Ok(_userService.GetUserByEmail(email));
         }
 
+        [Authorize]
         [HttpPut("/password")]
         
         public IActionResult UpdateUser([FromBody] string password)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            var userTypeString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-            if (userIdClaim == null)
-            {
-                throw new Exception("Usuario no autenticado.");
-            }
 
             if (!int.TryParse(userIdClaim.Value, out int userId))
             {
-                throw new Exception("Invalid user ID format.");
+                throw new BadRequestException("Invalid user ID format.");
             }
 
             _userService.UpdateUser(userId, password);
@@ -93,9 +79,10 @@ namespace Web.Controllers
             return Ok(new { message = "Password updated successfully." });
         }
 
-        [HttpDelete]
+        [Authorize("SuperAdmin")]
+        [HttpDelete("{userId}")]
        
-        public IActionResult DeleteUser([FromBody] int userId)
+        public IActionResult DeleteUser([FromRoute] int userId)
         {
             
             _userService.DeleteUser(userId);
