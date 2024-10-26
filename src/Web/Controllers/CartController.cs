@@ -4,7 +4,9 @@ using Domain.Enums;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ServiceStack;
 using System.Security.Claims;
+using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace Web.Controllers
 {
@@ -35,6 +37,16 @@ namespace Web.Controllers
             var cart = await _cartService.GetCartsByUserIdAsync(userId);
             return cart != null ? Ok(cart) : throw new NotFoundException("User ID is not valid."); ;
         }
+
+        [Authorize(Roles = "SuperAdmin, Admin")]
+        [HttpGet("/get-all-carts")]
+        public async Task<IActionResult> GetAllCarts()
+        {
+            var carts = await _cartService.GetAllCarts();
+            return Ok(carts);
+
+        }
+
 
         [Authorize]
         [HttpPost("/add-product/{productId}")]

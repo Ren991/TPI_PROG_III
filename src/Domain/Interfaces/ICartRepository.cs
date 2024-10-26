@@ -16,5 +16,7 @@ namespace Domain.Interfaces
 
         Task<List<Cart>> GetPaidCartsByUserIdAsync(int userId);
 
+        Task<List<Cart>> GetAllCarts();
+
     }
 }

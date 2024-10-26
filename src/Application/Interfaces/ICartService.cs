@@ -19,5 +19,7 @@ namespace Application.Interfaces
         Task<double> CalculateTotalPriceAsync(int userId);
         Task PayCartAsync(int userId, TypePayment typePayment);
         Task<List<CartDto>> GetCartsByUserIdAsync(int userId);
+
+        Task<List<CartDto>> GetAllCarts();
     }
 }

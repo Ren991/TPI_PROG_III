@@ -23,6 +23,20 @@ namespace Application.Services
             _productRepository = productRepository;
         }
 
+        //Listado de carritos
+        public async Task<List<CartDto>> GetAllCarts()
+        {
+            var carts = await _cartRepository.GetAllCarts();
+
+            var cartDtos = carts.Select(cart => CartDto.ToDto(cart)).ToList();
+
+            if (cartDtos == null)
+            {
+                throw new NotFoundException("Carts not found");
+            }
+            return cartDtos;
+        }
+
         // Crear un nuevo carrito para un usuario
         public async Task<CartDto> CreateCartForUserAsync(int userId)
         {

@@ -27,6 +27,14 @@ namespace Infrastructure.Data
                 .ToListAsync();
         }
 
+        // Obtener todos los carritos de los usuarios
+        public async Task<List<Cart>> GetAllCarts()
+        {
+            return await _context.Carts
+                .Include(c => c.CartLineList) // Incluir las líneas de venta de cada carrito
+                .ToListAsync();
+        }
+
         // Crear un nuevo carrito
         public async Task<Cart> CreateAsync(Cart cart)
         {
